@@ -1,26 +1,23 @@
 import pandas as pd
-import glob
+import os
 
-# List all CSV files in the directory
-csv_files = glob.glob('*.csv')
+# Directory containing your CSV files
+directory = '/Users/anaskhouaja/pfe/TABARKA 7 NOVEMBRE'
 
-# Create a Pandas Excel writer using xlsxwriter as the engine
-with pd.ExcelWriter('combined_data.xlsx', engine='xlsxwriter') as writer:
-    for csv_file in csv_files:
-        # Read CSV into Pandas DataFrame
-        df = pd.read_csv(csv_file)
-        # Extract file name without extension for sheet name
-        sheet_name = csv_file.split('.')[0]
-        # Write DataFrame to Excel as a sheet with table formatting
-        df.to_excel(writer, sheet_name=sheet_name, index=False, engine='xlsxwriter')
+# Get list of CSV files in the directory
+csv_files = [file for file in os.listdir(directory) if file.endswith('.csv')]
 
-        # Get the xlsxwriter workbook and worksheet objects
-        workbook = writer.book
-        worksheet = writer.sheets[sheet_name]
+# Initialize an empty list to store DataFrames
+data_frames = []
 
-        # Add table formatting
-        max_row = len(df)
-        max_col = len(df.columns)
-        worksheet.add_table(0, 0, max_row, max_col - 1, {'header_row': True})
+# Loop through each CSV file, read its data into a DataFrame, and store it in the list
+for file in csv_files:
+    file_path = os.path.join(directory, file)
+    data = pd.read_csv(file_path)  # Read CSV file
+    data_frames.append(data)  # Append DataFrame to list
 
-print("Combined data saved to combined_data.xlsx")
+# Concatenate all DataFrames in the list
+combined_data = pd.concat(data_frames, ignore_index=True)
+
+# Save the combined data to a new CSV file
+combined_data.to_csv('/Users/anaskhouaja/pfe/TABARKA 7 NOVEMBRE/combined.csv', index=False)
